@@ -1,0 +1,22 @@
+{
+  "name": "telegram-chat-bot",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "tsc index.ts",
+    "start": "node index.js",
+    "dev": "npm run build && node -r dotenv/config index.js dotenv_config_path=.env dotenv_config_debug=true",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "dotenv": "16.0.3",
+    "node-telegram-bot-api": "0.61.0"
+  },
+  "devDependencies": {
+    "@types/node-telegram-bot-api": "0.61.2",
+    "typescript": "4.9.5"
+  }
+}

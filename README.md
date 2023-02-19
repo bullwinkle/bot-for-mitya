@@ -1,1 +1,1 @@
-# bot-for-mitya
+# bot-for-manya
