@@ -10,3 +10,11 @@ bot.on('message', (msg) => {
 
   bot.sendMessage(chatId, `${process.env.NODE_ENV === 'production' ? 'Remote' : 'Local'} said: ${messageText}`);
 });
+
+bot.startPolling({restart: true, polling: true})
+    .then((e) => {
+      console.log('then', e);
+    })
+    .catch((e) => {
+      console.warn('catch', e);
+    });
