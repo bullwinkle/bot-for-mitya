@@ -1,5 +1,11 @@
-import { Context, Markup, Telegraf, Telegram } from 'telegraf';
-import { Update } from 'typegram';
+import {Context, Markup, Telegraf, Telegram} from 'telegraf';
+import {Update} from 'typegram';
+import {Configuration as OpenAIConfiguration, OpenAIApi} from "openai";
+
+const openAIConfiguration = new OpenAIConfiguration({
+    apiKey: process.env.OPENAI_TOKEN,
+});
+const openai = new OpenAIApi(openAIConfiguration);
 
 const token: string = process.env.BOT_TOKEN as string;
 
@@ -40,18 +46,31 @@ bot.command('keyboard', (ctx) => {
 
 bot.on('text', async (ctx) => {
     console.log(ctx)
-    ctx.reply(
-        'You choose the ' +
-        (ctx.message.text === 'first' ? 'First' : 'Second') +
-        ' Option!'
-    );
+    // ctx.reply(
+    //     'You choose the ' +
+    //     (ctx.message.text === 'first' ? 'First' : 'Second') +
+    //     ' Option!'
+    // );
+    //
+    // if (chatId) {
+    //     await telegram.sendMessage(
+    //         chatId,
+    //         'This message was sent without your interaction!'
+    //     );
+    // }
 
-    if (chatId) {
-        await telegram.sendMessage(
-            chatId,
-            'This message was sent without your interaction!'
-        );
-    }
+    await openai.createImage({
+        prompt: ctx.message.text, //user entered input text will store here.
+        n: 2, //number of images that are we expecting from OpenAI API.
+        size: '512x512' //size of image that are we expecting from OpenAI API.
+    }).then(x => {
+        console.log('x: ', x.data);
+
+        ctx.reply(String(x.data.data[0].url))
+    }).catch(y => {
+        console.log('y: ', y);
+        ctx.reply(String('Request error'));
+    });
 });
 
 bot.launch();
