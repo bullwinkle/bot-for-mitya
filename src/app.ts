@@ -66,7 +66,7 @@ bot.on('text', async (ctx) => {
     }).then(x => {
         console.log('x: ', x.data);
 
-        ctx.replyWithPhoto({ source: String(x.data.data[0].url) }, { caption: "cat photo" });
+        ctx.replyWithPhoto({ source: String(x.data.data[0].url) }, { caption: ctx.message.text });
     }).catch(y => {
         console.log('y: ', y);
         ctx.reply(String('Request error'));
