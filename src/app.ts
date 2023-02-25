@@ -61,17 +61,40 @@ bot.on('text', async (ctx) => {
 
     await openai.createImage({
         prompt: ctx.message.text, //user entered input text will store here.
-        n: 1, //number of images that are we expecting from OpenAI API.
+        n: 4, //number of images that are we expecting from OpenAI API.
         size: '1024x1024' //size of image that are we expecting from OpenAI API.
     }).then(x => {
         console.log('x: ', x.data);
 
-        ctx.replyWithPhoto({ url: String(x.data.data[0].url) }, { caption: ctx.message.text });
+        for (const {url} of x.data.data) {
+            ctx.replyWithPhoto({ url: String(url) }, { caption: ctx.message.text });
+        }
     }).catch(y => {
         console.log('y: ', y);
         ctx.reply(String('Request error'));
     });
 });
+
+// bot.on('message', async (ctx) => {
+//     console.log(ctx)
+//     // @ts-ignore
+//     console.log(ctx.update.message.photo.reverse()[0]);
+//
+//
+//     await openai.createImageVariation({
+//         prompt: ctx.message.text, //user entered input text will store here.
+//         n: 1, //number of images that are we expecting from OpenAI API.
+//         size: '1024x1024' //size of image that are we expecting from OpenAI API.
+//     }).then(x => {
+//         console.log('x: ', x.data);
+//
+//         ctx.replyWithPhoto({ url: String(x.data.data[0].url) }, { caption: ctx.message.text });
+//     }).catch(y => {
+//         console.log('y: ', y);
+//         ctx.reply(String('Request error'));
+//     });
+// });
+
 
 bot.launch();
 
