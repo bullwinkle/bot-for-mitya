@@ -56,8 +56,7 @@ bot.on('text', async (ctx) => {
     // );
     //
 
-    // if (CHAT_ID && ctx.chat.id !== CHAT_ID) {
-    if (CHAT_ID) {
+    if (CHAT_ID && ctx.chat.id !== CHAT_ID) {
         telegram.sendMessage(
             CHAT_ID,
             `
