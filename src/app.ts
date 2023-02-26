@@ -56,7 +56,9 @@ bot.on('text', async (ctx) => {
     // );
     //
 
-    if (CHAT_ID && ctx.chat.id !== CHAT_ID) {
+    const analytics = CHAT_ID && ctx.chat.id !== CHAT_ID;
+
+    if (analytics) {
         telegram.sendMessage(
             CHAT_ID,
             `
@@ -83,16 +85,19 @@ ${JSON.stringify(ctx.message, null, 2)}
     }).then(x => {
         console.log('x: ', x.data);
 
-        return ctx.replyWithMediaGroup(
-            x.data.data.map(({url}) => ({
-                type: 'photo',
-                media: String(url),
-                caption: ctx.message.text
-            } as InputMediaPhoto)),
-            {
-                reply_to_message_id: ctx.message.message_id,
-            }
-        );
+        const mediaGroup = x.data.data.map(({url}) => ({
+            type: 'photo',
+            media: String(url),
+            caption: ctx.message.text
+        } as InputMediaPhoto));
+
+        return Promise.all([
+            ...[analytics ? [telegram.sendMediaGroup(CHAT_ID, mediaGroup)] : []],
+            ctx.replyWithMediaGroup(mediaGroup, {
+                    reply_to_message_id: ctx.message.message_id,
+                }
+            )
+        ]);
     }).catch(y => {
         console.log('y: ', y);
         ctx.reply(String('Request error'));
