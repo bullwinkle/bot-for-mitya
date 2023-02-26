@@ -3,18 +3,19 @@ import {Update} from 'typegram';
 import {Configuration as OpenAIConfiguration, OpenAIApi} from "openai";
 import {InputMediaPhoto} from "telegraf/types";
 
+const isProduction = process.env.NODE_ENV == 'production';
+const CHAT_ID = Number(process.env.CHAT_ID || 0);
+const OPEN_AI_API_KEY = process.env.OPENAI_TOKEN as string;
+const BOT_TOKEN = process.env.BOT_TOKEN as string;
+
 const openAIConfiguration = new OpenAIConfiguration({
-    apiKey: process.env.OPENAI_TOKEN,
+    apiKey: OPEN_AI_API_KEY,
 });
 const openai = new OpenAIApi(openAIConfiguration);
 
-const token: string = process.env.BOT_TOKEN as string;
+const telegram: Telegram = new Telegram(BOT_TOKEN);
 
-const telegram: Telegram = new Telegram(token);
-
-const bot: Telegraf<Context<Update>> = new Telegraf(token);
-
-const chatId: string = process.env.CHAT_ID as string;
+const bot: Telegraf<Context<Update>> = new Telegraf(BOT_TOKEN);
 
 bot.start((ctx) => {
     ctx.reply('Hello ' + ctx.from.first_name + '!');
@@ -47,18 +48,33 @@ bot.command('keyboard', (ctx) => {
 
 bot.on('text', async (ctx) => {
     console.log(ctx)
+    console.log(ctx.chat)
     // ctx.reply(
     //     'You choose the ' +
     //     (ctx.message.text === 'first' ? 'First' : 'Second') +
     //     ' Option!'
     // );
     //
-    // if (chatId) {
-    //     await telegram.sendMessage(
-    //         chatId,
-    //         'This message was sent without your interaction!'
-    //     );
-    // }
+
+    if (CHAT_ID && ctx.chat.id !== CHAT_ID) {
+        telegram.sendMessage(
+            CHAT_ID,
+            `
+From:
+\`\`\`JSON
+${JSON.stringify(ctx.from, null, 2)}
+\`\`\`
+Message:
+\`\`\`JSON
+${JSON.stringify(ctx.message, null, 2)}
+\`\`\`
+`,
+            {
+                parse_mode: 'Markdown',
+                disable_notification: true
+            }
+        );
+    }
 
     await openai.createImage({
         prompt: ctx.message.text, //user entered input text will store here.
@@ -67,7 +83,7 @@ bot.on('text', async (ctx) => {
     }).then(x => {
         console.log('x: ', x.data);
 
-        ctx.replyWithMediaGroup(
+        return ctx.replyWithMediaGroup(
             x.data.data.map(({url}) => ({
                 type: 'photo',
                 media: String(url),
@@ -76,7 +92,7 @@ bot.on('text', async (ctx) => {
             {
                 reply_to_message_id: ctx.message.message_id,
             }
-        )
+        );
     }).catch(y => {
         console.log('y: ', y);
         ctx.reply(String('Request error'));
