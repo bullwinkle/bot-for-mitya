@@ -1,6 +1,7 @@
 import {Context, Markup, Telegraf, Telegram} from 'telegraf';
 import {Update} from 'typegram';
 import {Configuration as OpenAIConfiguration, OpenAIApi} from "openai";
+import {InputMediaPhoto} from "telegraf/types";
 
 const openAIConfiguration = new OpenAIConfiguration({
     apiKey: process.env.OPENAI_TOKEN,
@@ -66,9 +67,16 @@ bot.on('text', async (ctx) => {
     }).then(x => {
         console.log('x: ', x.data);
 
-        for (const {url} of x.data.data) {
-            ctx.replyWithPhoto({ url: String(url) }, { caption: ctx.message.text });
-        }
+        ctx.replyWithMediaGroup(
+            x.data.data.map(({url}) => ({
+                type: 'photo',
+                media: String(url),
+                caption: ctx.message.text
+            } as InputMediaPhoto)),
+            {
+                reply_to_message_id: ctx.message.message_id,
+            }
+        )
     }).catch(y => {
         console.log('y: ', y);
         ctx.reply(String('Request error'));
