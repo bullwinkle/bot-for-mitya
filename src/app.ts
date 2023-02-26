@@ -62,7 +62,7 @@ bot.on('text', async (ctx) => {
 
     await openai.createImage({
         prompt: ctx.message.text, //user entered input text will store here.
-        n: 4, //number of images that are we expecting from OpenAI API.
+        n: 6, //number of images that are we expecting from OpenAI API.
         size: '1024x1024' //size of image that are we expecting from OpenAI API.
     }).then(x => {
         console.log('x: ', x.data);
