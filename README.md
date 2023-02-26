@@ -1,1 +1,1 @@
-# Draw bot
+# bot-for-manya
